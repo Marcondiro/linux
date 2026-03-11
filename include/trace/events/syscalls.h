@@ -15,7 +15,7 @@
 
 #ifdef CONFIG_HAVE_SYSCALL_TRACEPOINTS
 
-TRACE_EVENT_SYSCALL(sys_enter,
+TRACE_EVENT_SYSCALL_WRITABLE(sys_enter,
 
 	TP_PROTO(struct pt_regs *regs, long id),
 
@@ -36,7 +36,9 @@ TRACE_EVENT_SYSCALL(sys_enter,
 		  __entry->args[0], __entry->args[1], __entry->args[2],
 		  __entry->args[3], __entry->args[4], __entry->args[5]),
 
-	syscall_regfunc, syscall_unregfunc
+	syscall_regfunc, syscall_unregfunc,
+
+	sizeof(struct pt_regs)
 );
 
 TRACE_EVENT_FLAGS(sys_enter, TRACE_EVENT_FL_CAP_ANY)

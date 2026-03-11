@@ -128,9 +128,20 @@ static inline void bpf_test_buffer_##call(void)				\
 	__BPF_DECLARE_TRACE(call##_tp, PARAMS(proto), PARAMS(args)) \
 	__DEFINE_EVENT(call##_tp, call##_tp, PARAMS(proto), PARAMS(args), size)
 
+#undef TRACE_EVENT_SYSCALL_WRITABLE
+#define TRACE_EVENT_SYSCALL_WRITABLE(name, proto, args, tstruct, assign, print, reg, unreg, size) \
+	DECLARE_EVENT_SYSCALL_CLASS(name,		       \
+			     PARAMS(proto),		       \
+			     PARAMS(args),		       \
+			     PARAMS(tstruct),		       \
+			     PARAMS(assign),		       \
+			     PARAMS(print));		       \
+	DEFINE_EVENT_WRITABLE(name, name, PARAMS(proto), PARAMS(args), size);
+
 #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
 
 #undef DECLARE_TRACE_WRITABLE
+#undef TRACE_EVENT_SYSCALL_WRITABLE
 #undef DEFINE_EVENT_WRITABLE
 #undef __CHECK_WRITABLE_BUF_SIZE
 #undef __DEFINE_EVENT

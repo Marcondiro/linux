@@ -645,6 +645,9 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
 #define TRACE_EVENT_SYSCALL(name, proto, args, struct, assign,	\
 			    print, reg, unreg)			\
 	DECLARE_TRACE_EVENT_SYSCALL(name, PARAMS(proto), PARAMS(args))
+#define TRACE_EVENT_SYSCALL_WRITABLE(name, proto, args, struct,	\
+			    assign, print, reg, unreg, size)	\
+	DECLARE_TRACE_EVENT_SYSCALL(name, PARAMS(proto), PARAMS(args))
 
 #define TRACE_EVENT_FLAGS(event, flag)
 

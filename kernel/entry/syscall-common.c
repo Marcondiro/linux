@@ -9,12 +9,23 @@
 
 long trace_syscall_enter(struct pt_regs *regs, long syscall)
 {
-	trace_sys_enter(regs, syscall);
+	struct pt_regs scratch = *regs;
+	unsigned long args[6];
+
+	trace_sys_enter(&scratch, syscall);
 	/*
 	 * Probes or BPF hooks in the tracepoint may have changed the
-	 * system call number. Reread it.
+	 * system call number as well as the arguments. Write back
+	 * the potentially modified arguments.
 	 */
-	return syscall_get_nr(current, regs);
+	syscall = syscall_get_nr(current, &scratch);
+	syscall_set_nr(current, regs, syscall);
+	if (syscall != -1) {
+		syscall_get_arguments(current, &scratch, args);
+		syscall_set_arguments(current, regs, args);
+	}
+
+	return syscall;
 }
 
 void trace_syscall_exit(struct pt_regs *regs, long ret)
