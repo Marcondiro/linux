@@ -205,10 +205,20 @@ static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
 	       tp_event->class == &event_class_syscall_exit;
 }
 
+static inline int is_syscall_enter_trace_event(struct trace_event_call *tp_event)
+{
+	return tp_event->class == &event_class_syscall_enter;
+}
+
 #else
 #define SYSCALL_METADATA(sname, nb, ...)
 
 static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
+{
+	return 0;
+}
+
+static inline int is_syscall_enter_trace_event(struct trace_event_call *tp_event)
 {
 	return 0;
 }

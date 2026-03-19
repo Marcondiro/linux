@@ -11643,6 +11643,12 @@ static int __perf_event_set_bpf_prog(struct perf_event *event,
 	    (is_syscall_tp && prog->type != BPF_PROG_TYPE_TRACEPOINT))
 		return -EINVAL;
 
+	if (prog->expected_attach_type == BPF_TRACEPOINT_SYSCALL_ENTER) {
+		if (!is_syscall_tp ||
+		    !is_syscall_enter_trace_event(event->tp_event))
+			return -EINVAL;
+	}
+
 	if (prog->type == BPF_PROG_TYPE_KPROBE && prog->sleepable && !is_uprobe)
 		/* only uprobe programs are allowed to be sleepable */
 		return -EINVAL;

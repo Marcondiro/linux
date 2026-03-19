@@ -1,0 +1,3 @@
+# rfc email body
+
+One clearer implementation could be to add a TP_fast_writeback parameter to the TRACE_EVENT() marco, on the same line of TP_fast_assign, that takes the stuct defined with TP_STRUCT__entry(..) and writes back to the first arg provided with TP_ARGS().

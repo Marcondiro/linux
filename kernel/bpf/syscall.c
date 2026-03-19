@@ -2746,6 +2746,11 @@ bpf_prog_load_check_attach(enum bpf_prog_type prog_type,
 		if (expected_attach_type == BPF_NETFILTER)
 			return 0;
 		return -EINVAL;
+	case BPF_PROG_TYPE_TRACEPOINT:
+		if (expected_attach_type &&
+		    expected_attach_type != BPF_TRACEPOINT_SYSCALL_ENTER)
+			return -EINVAL;
+		return 0;
 	case BPF_PROG_TYPE_SYSCALL:
 	case BPF_PROG_TYPE_EXT:
 		if (expected_attach_type)

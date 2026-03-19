@@ -1458,8 +1458,28 @@ static bool tp_prog_is_valid_access(int off, int size, enum bpf_access_type type
 {
 	if (off < sizeof(void *) || off >= PERF_MAX_TRACE_SIZE)
 		return false;
-	if (type != BPF_READ)
+
+	switch (type) {
+	case BPF_READ:
+		break;
+	case BPF_WRITE:
+		if (prog->expected_attach_type != BPF_TRACEPOINT_SYSCALL_ENTER)
+			return false;
+		/*
+		 * Allow writing to 'args' in the syscall_tp_t layout:
+		 *   struct trace_entry ent;
+		 *   int syscall_nr;
+		 *   unsigned long args[SYSCALL_DEFINE_MAXARGS];
+		 */
+		if (off < sizeof(struct trace_entry) + sizeof(long) ||
+		    off + size > sizeof(struct trace_entry) + sizeof(long) +
+				 SYSCALL_DEFINE_MAXARGS * sizeof(long))
+			return false;
+		break;
+	default:
 		return false;
+	}
+
 	if (off % size != 0)
 		return false;
 

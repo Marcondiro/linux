@@ -9856,7 +9856,9 @@ static const struct bpf_sec_def section_defs[] = {
 	SEC_DEF("action",		SCHED_ACT, 0, SEC_NONE), /* deprecated / legacy, use tcx */
 	SEC_DEF("netkit/primary",	SCHED_CLS, BPF_NETKIT_PRIMARY, SEC_NONE),
 	SEC_DEF("netkit/peer",		SCHED_CLS, BPF_NETKIT_PEER, SEC_NONE),
+	SEC_DEF("tracepoint/syscalls/sys_enter_+",	TRACEPOINT, BPF_TRACEPOINT_SYSCALL_ENTER, SEC_NONE, attach_tp),
 	SEC_DEF("tracepoint+",		TRACEPOINT, 0, SEC_NONE, attach_tp),
+	SEC_DEF("tp/syscalls/sys_enter_+",		TRACEPOINT, BPF_TRACEPOINT_SYSCALL_ENTER, SEC_NONE, attach_tp),
 	SEC_DEF("tp+",			TRACEPOINT, 0, SEC_NONE, attach_tp),
 	SEC_DEF("raw_tracepoint+",	RAW_TRACEPOINT, 0, SEC_NONE, attach_raw_tp),
 	SEC_DEF("raw_tp+",		RAW_TRACEPOINT, 0, SEC_NONE, attach_raw_tp),

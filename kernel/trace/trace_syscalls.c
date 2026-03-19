@@ -1373,6 +1373,7 @@ static int sys_perf_refcount_enter;
 static int sys_perf_refcount_exit;
 
 static int perf_call_bpf_enter(struct trace_event_call *call, struct pt_regs *regs,
+			       struct pt_regs *real_regs,
 			       struct syscall_metadata *sys_data,
 			       struct syscall_trace_enter *rec)
 {
@@ -1381,7 +1382,7 @@ static int perf_call_bpf_enter(struct trace_event_call *call, struct pt_regs *re
 		int syscall_nr;
 		unsigned long args[SYSCALL_DEFINE_MAXARGS];
 	} __aligned(8) param;
-	int i;
+	int i, ret;
 
 	BUILD_BUG_ON(sizeof(param.ent) < sizeof(void *));
 
@@ -1391,7 +1392,12 @@ static int perf_call_bpf_enter(struct trace_event_call *call, struct pt_regs *re
 	param.syscall_nr = rec->nr;
 	for (i = 0; i < sys_data->nb_args; i++)
 		param.args[i] = rec->args[i];
-	return trace_call_bpf(call, &param);
+	ret = trace_call_bpf(call, &param);
+
+	/* Propagate BPF-modified args back to pt_regs */
+	syscall_set_arguments(current, real_regs, param.args);
+
+	return ret;
 }
 
 static void perf_syscall_enter(void *ignore, struct pt_regs *regs, long id)
@@ -1460,7 +1466,7 @@ static void perf_syscall_enter(void *ignore, struct pt_regs *regs, long id)
 		syscall_put_data(sys_data, rec, user_ptr, size, user_sizes, uargs);
 
 	if ((valid_prog_array &&
-	     !perf_call_bpf_enter(sys_data->enter_event, fake_regs, sys_data, rec)) ||
+	     !perf_call_bpf_enter(sys_data->enter_event, fake_regs, regs, sys_data, rec)) ||
 	    hlist_empty(head)) {
 		perf_swevent_put_recursion_context(rctx);
 		return;
